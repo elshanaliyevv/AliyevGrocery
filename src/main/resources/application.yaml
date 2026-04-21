@@ -1,0 +1,12 @@
+spring:
+  application:
+    name: AliyevGrocery
+  datasource:
+    url: jdbc:postgresql://localhost:8081/aliyev_grocery
+    username: postgres
+    password: postgres
+  jpa:
+    hibernate:
+      ddl-auto: update
+server:
+  port: 9095
