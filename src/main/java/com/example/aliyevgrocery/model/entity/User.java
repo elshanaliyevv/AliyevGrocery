@@ -2,6 +2,7 @@ package com.example.aliyevgrocery.model.entity;
 
 import com.example.aliyevgrocery.Enums.Roles;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.*;
@@ -26,7 +27,9 @@ public class User {
     String username;
     @Size(min = 8)
     String password;
+    @Email
     String email;
+    @NotNull
     String number;
     @CreationTimestamp
     @Column(name = "created_at")
