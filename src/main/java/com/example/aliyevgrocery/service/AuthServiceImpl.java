@@ -1,11 +1,10 @@
 package com.example.aliyevgrocery.service;
 
-import com.example.aliyevgrocery.Enums.Roles;
+import com.example.aliyevgrocery.mapper.Mapper;
 import com.example.aliyevgrocery.model.request.UserLogin;
 import com.example.aliyevgrocery.model.request.UserRegister;
 import com.example.aliyevgrocery.model.response.AuthResponse;
 import com.example.aliyevgrocery.model.response.TokensResponse;
-import com.example.aliyevgrocery.model.response.UserResponse;
 import com.example.aliyevgrocery.model.entity.User;
 import com.example.aliyevgrocery.repository.UserRepo;
 import lombok.RequiredArgsConstructor;
@@ -24,6 +23,7 @@ public class AuthServiceImpl implements AuthService {
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
     private final AuthenticationManager authenticationManager;
+    private final Mapper mapper;
 
     @Override
     @Transactional
@@ -40,19 +40,12 @@ public class AuthServiceImpl implements AuthService {
             throw new RuntimeException("Bu nömrə artıq mövcuddur");
         }
 
-        User user = User.builder()
-                .username(userRegister.getUsername())
-                .email(userRegister.getEmail())
-                .number(userRegister.getNumber())
-                .password(passwordEncoder.encode(userRegister.getPassword()))
-                .role(Roles.USER)
-                .isActive(true)
-                .build();
+        User user = mapper.toUser(userRegister, passwordEncoder.encode(userRegister.getPassword()));
 
         User savedUser = userRepo.save(user);
         TokensResponse tokens = jwtService.generateTokens(savedUser.getUsername());
 
-        return buildAuthResponse(savedUser, tokens);
+        return mapper.toAuthResponse(savedUser, tokens);
     }
 
     @Override
@@ -71,19 +64,6 @@ public class AuthServiceImpl implements AuthService {
         ).orElseThrow(() -> new RuntimeException("İstifadəçi tapılmadı"));
 
         TokensResponse tokens = jwtService.generateTokens(user.getUsername());
-        return buildAuthResponse(user, tokens);
-    }
-
-    private AuthResponse buildAuthResponse(User user, TokensResponse tokens) {
-        UserResponse userResponse = new UserResponse();
-        userResponse.setId(user.getId());
-        userResponse.setUsername(user.getUsername());
-        userResponse.setEmail(user.getEmail());
-        userResponse.setNumber(user.getNumber());
-
-        AuthResponse authResponse = new AuthResponse();
-        authResponse.setTokensResponse(tokens);
-        authResponse.setUserResponse(userResponse);
-        return authResponse;
+        return mapper.toAuthResponse(user, tokens);
     }
 }
