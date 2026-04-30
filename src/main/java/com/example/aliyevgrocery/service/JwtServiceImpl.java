@@ -1,5 +1,6 @@
 package com.example.aliyevgrocery.service;
 
+import com.example.aliyevgrocery.exception.InvalidRefreshTokenException;
 import com.example.aliyevgrocery.model.response.TokensResponse;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtException;
@@ -69,7 +70,7 @@ public class JwtServiceImpl implements JwtService {
     @Override
     public TokensResponse refreshAccessToken(String refreshToken) {
         if (!isValidRefresh(refreshToken)) {
-            throw new RuntimeException("Refresh token etibarsızdır");
+            throw new InvalidRefreshTokenException("Refresh token etibarsızdır");
         }
 
         String username = extractUsernameFromRefreshToken(refreshToken);
