@@ -22,7 +22,8 @@ public class GlobalExceptionHandler {
     @ExceptionHandler({
             UsernameAlreadyExistsException.class,
             EmailAlreadyExistsException.class,
-            NumberAlreadyExistsException.class
+            NumberAlreadyExistsException.class,
+            ProductAlreadyExistsException.class
     })
     public ResponseEntity<ApiErrorResponse> handleConflict(RuntimeException exception,
                                                            HttpServletRequest request) {
@@ -31,7 +32,9 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler({
             UserNotFoundException.class,
-            UsernameNotFoundException.class
+            UsernameNotFoundException.class,
+            ProductNotFoundException.class,
+            CategoryNotFoundException.class
     })
     public ResponseEntity<ApiErrorResponse> handleNotFound(RuntimeException exception,
                                                            HttpServletRequest request) {

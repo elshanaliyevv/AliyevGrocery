@@ -3,14 +3,17 @@ package com.example.aliyevgrocery.mapper;
 import com.example.aliyevgrocery.Enums.OrderStatus;
 import com.example.aliyevgrocery.Enums.Roles;
 import com.example.aliyevgrocery.model.entity.Address;
+import com.example.aliyevgrocery.model.entity.Categories;
 import com.example.aliyevgrocery.model.entity.Products;
 import com.example.aliyevgrocery.model.entity.User;
 import com.example.aliyevgrocery.model.entity.UserProducts;
 import com.example.aliyevgrocery.model.request.AddressRequest;
+import com.example.aliyevgrocery.model.request.ProductRequest;
 import com.example.aliyevgrocery.model.request.UserProductsRequest;
 import com.example.aliyevgrocery.model.request.UserRegister;
 import com.example.aliyevgrocery.model.response.AddressResponse;
 import com.example.aliyevgrocery.model.response.AuthResponse;
+import com.example.aliyevgrocery.model.response.ProductResponse;
 import com.example.aliyevgrocery.model.response.TokensResponse;
 import com.example.aliyevgrocery.model.response.UserProductsResponse;
 import com.example.aliyevgrocery.model.response.UserResponse;
@@ -66,6 +69,28 @@ public class Mapper {
         response.setBuilding(address.getBuilding());
         response.setApartment(address.getApartment());
         response.setNote(address.getNote());
+        return response;
+    }
+
+    public Products toProduct(ProductRequest request, Categories category) {
+        Products product = new Products();
+        product.setName(request.getName());
+        product.setPrice(request.getPrice());
+        product.setCategories(category);
+        product.setIsActive(true);
+        return product;
+    }
+
+    public ProductResponse toProductResponse(Products product) {
+        ProductResponse response = new ProductResponse();
+        response.setId(product.getId());
+        response.setName(product.getName());
+        response.setPrice(product.getPrice());
+        response.setCategoryId(product.getCategories() != null ? product.getCategories().getId() : null);
+        response.setCategoryName(product.getCategories() != null ? product.getCategories().getName() : null);
+        response.setIsActive(product.getIsActive());
+        response.setCreatedAt(product.getCreated_at());
+        response.setUpdatedAt(product.getUpdated_at());
         return response;
     }
 

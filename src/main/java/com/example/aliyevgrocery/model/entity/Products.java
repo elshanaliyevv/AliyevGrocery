@@ -26,6 +26,8 @@ public class Products {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "categories_id")
     Categories categories;
+    @Column(name = "is_active")
+    Boolean isActive = true;
     @CreationTimestamp
     LocalDateTime created_at;
     @UpdateTimestamp

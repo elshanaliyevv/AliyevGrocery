@@ -13,4 +13,12 @@ public interface ProductsRepo extends JpaRepository<Products, Long> {
     boolean existsByName(String name);
 
     List<Products> findAllByCategoriesId(Long categoriesId);
+
+    Optional<Products> findByIdAndIsActiveTrue(Long id);
+
+    List<Products> findAllByIsActiveTrue();
+
+    List<Products> findAllByCategoriesIdAndIsActiveTrue(Long categoriesId);
+
+    boolean existsByNameAndIsActiveTrue(String name);
 }
