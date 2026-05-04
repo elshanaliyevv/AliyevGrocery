@@ -5,10 +5,7 @@ import jakarta.validation.constraints.Positive;
 import lombok.Data;
 
 @Data
-public class UserProductsRequest {
-    @NotNull
-    private Long productId;
-
+public class UpdateUserProductQuantityRequest {
     @NotNull
     @Positive
     private Integer quantity;

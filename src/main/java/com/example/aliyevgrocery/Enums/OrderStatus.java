@@ -1,6 +1,10 @@
 package com.example.aliyevgrocery.Enums;
 
 public enum OrderStatus {
+    CART,
+    PENDING,
     PREPARING,
-    DELIVERED
+    ON_THE_WAY,
+    DELIVERED,
+    CANCELLED
 }

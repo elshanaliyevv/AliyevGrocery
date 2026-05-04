@@ -11,6 +11,7 @@ import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 
 import java.time.LocalDateTime;
 import java.util.LinkedHashMap;
@@ -36,7 +37,8 @@ public class GlobalExceptionHandler {
             UsernameNotFoundException.class,
             ProductNotFoundException.class,
             CategoryNotFoundException.class,
-            AddressNotFoundException.class
+            AddressNotFoundException.class,
+            UserProductNotFoundException.class
     })
     public ResponseEntity<ApiErrorResponse> handleNotFound(RuntimeException exception,
                                                            HttpServletRequest request) {
@@ -58,6 +60,18 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ApiErrorResponse> handleAccessDenied(AccessDeniedException exception,
                                                                HttpServletRequest request) {
         return buildErrorResponse(HttpStatus.FORBIDDEN, "Bu əməliyyata icazəniz yoxdur", request, null);
+    }
+
+    @ExceptionHandler(InvalidOrderStatusException.class)
+    public ResponseEntity<ApiErrorResponse> handleBadRequest(RuntimeException exception,
+                                                             HttpServletRequest request) {
+        return buildErrorResponse(HttpStatus.BAD_REQUEST, exception.getMessage(), request, null);
+    }
+
+    @ExceptionHandler(MethodArgumentTypeMismatchException.class)
+    public ResponseEntity<ApiErrorResponse> handleTypeMismatch(MethodArgumentTypeMismatchException exception,
+                                                               HttpServletRequest request) {
+        return buildErrorResponse(HttpStatus.BAD_REQUEST, "Sorğu parametri düzgün deyil", request, null);
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)

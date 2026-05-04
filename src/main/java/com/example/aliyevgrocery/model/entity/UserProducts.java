@@ -9,6 +9,7 @@ import lombok.experimental.FieldDefaults;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @Data
@@ -31,9 +32,15 @@ public class UserProducts {
     @NotNull
     Integer quantity;
 
+    @Column(name = "unit_price", precision = 10, scale = 2)
+    BigDecimal unitPrice;
+
+    @Column(name = "total_price", precision = 10, scale = 2)
+    BigDecimal totalPrice;
+
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    OrderStatus status = OrderStatus.PREPARING;
+    OrderStatus status = OrderStatus.CART;
 
     @CreationTimestamp
     @Column(name = "created_at")

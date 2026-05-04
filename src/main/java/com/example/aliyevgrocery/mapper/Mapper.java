@@ -19,6 +19,8 @@ import com.example.aliyevgrocery.model.response.UserProductsResponse;
 import com.example.aliyevgrocery.model.response.UserResponse;
 import org.springframework.stereotype.Component;
 
+import java.math.BigDecimal;
+
 @Component
 public class Mapper {
 
@@ -99,16 +101,28 @@ public class Mapper {
         userProducts.setUser(user);
         userProducts.setProduct(product);
         userProducts.setQuantity(request.getQuantity());
-        userProducts.setStatus(request.getStatus() != null ? request.getStatus() : OrderStatus.PREPARING);
+        userProducts.setUnitPrice(product.getPrice());
+        userProducts.setTotalPrice(product.getPrice().multiply(BigDecimal.valueOf(request.getQuantity())));
+        userProducts.setStatus(OrderStatus.CART);
         return userProducts;
     }
 
     public UserProductsResponse toUserProductsResponse(UserProducts userProducts) {
+        BigDecimal unitPrice = userProducts.getUnitPrice() != null
+                ? userProducts.getUnitPrice()
+                : userProducts.getProduct().getPrice();
+        BigDecimal totalPrice = userProducts.getTotalPrice() != null
+                ? userProducts.getTotalPrice()
+                : unitPrice.multiply(BigDecimal.valueOf(userProducts.getQuantity()));
+
         UserProductsResponse response = new UserProductsResponse();
         response.setId(userProducts.getId());
         response.setUserId(userProducts.getUser().getId());
         response.setProductId(userProducts.getProduct().getId());
+        response.setProductName(userProducts.getProduct().getName());
         response.setQuantity(userProducts.getQuantity());
+        response.setUnitPrice(unitPrice);
+        response.setTotalPrice(totalPrice);
         response.setStatus(userProducts.getStatus());
         response.setCreatedAt(userProducts.getCreatedAt());
         response.setUpdatedAt(userProducts.getUpdatedAt());
