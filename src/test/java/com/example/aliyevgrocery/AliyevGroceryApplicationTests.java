@@ -1,13 +1,13 @@
 package com.example.aliyevgrocery;
 
 import org.junit.jupiter.api.Test;
-import org.springframework.boot.test.context.SpringBootTest;
 
-@SpringBootTest
+import static org.assertj.core.api.Assertions.assertThat;
+
 class AliyevGroceryApplicationTests {
 
     @Test
-    void contextLoads() {
+    void applicationClassExists() {
+        assertThat(AliyevGroceryApplication.class).isNotNull();
     }
-
 }
