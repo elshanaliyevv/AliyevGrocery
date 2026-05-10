@@ -4,6 +4,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.ConstraintViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -25,6 +26,7 @@ public class GlobalExceptionHandler {
             EmailAlreadyExistsException.class,
             NumberAlreadyExistsException.class,
             ProductAlreadyExistsException.class,
+            CategoryAlreadyExistsException.class,
             AddressAlreadyExistsException.class
     })
     public ResponseEntity<ApiErrorResponse> handleConflict(RuntimeException exception,
@@ -66,6 +68,12 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ApiErrorResponse> handleBadRequest(RuntimeException exception,
                                                              HttpServletRequest request) {
         return buildErrorResponse(HttpStatus.BAD_REQUEST, exception.getMessage(), request, null);
+    }
+
+    @ExceptionHandler(HttpMessageNotReadableException.class)
+    public ResponseEntity<ApiErrorResponse> handleUnreadableMessage(HttpMessageNotReadableException exception,
+                                                                    HttpServletRequest request) {
+        return buildErrorResponse(HttpStatus.BAD_REQUEST, "Sorğu body-si düzgün deyil", request, null);
     }
 
     @ExceptionHandler(MethodArgumentTypeMismatchException.class)

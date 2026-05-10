@@ -2,16 +2,22 @@ package com.example.aliyevgrocery.controller;
 
 import com.example.aliyevgrocery.Enums.OrderStatus;
 import com.example.aliyevgrocery.exception.GlobalExceptionHandler;
+import com.example.aliyevgrocery.model.request.CategoryRequest;
+import com.example.aliyevgrocery.model.request.ProductRequest;
 import com.example.aliyevgrocery.model.request.UpdateOrderStatusRequest;
 import com.example.aliyevgrocery.model.response.AddressResponse;
 import com.example.aliyevgrocery.model.response.AuthResponse;
+import com.example.aliyevgrocery.model.response.CategoryResponse;
+import com.example.aliyevgrocery.model.response.ProductResponse;
 import com.example.aliyevgrocery.model.response.TokensResponse;
 import com.example.aliyevgrocery.model.response.UserProductsResponse;
 import com.example.aliyevgrocery.model.response.UserProductsSummaryResponse;
 import com.example.aliyevgrocery.model.response.UserResponse;
 import com.example.aliyevgrocery.service.AddressService;
 import com.example.aliyevgrocery.service.AuthService;
+import com.example.aliyevgrocery.service.CategoryService;
 import com.example.aliyevgrocery.service.JwtService;
+import com.example.aliyevgrocery.service.ProductService;
 import com.example.aliyevgrocery.service.UserProductsService;
 import com.example.aliyevgrocery.service.UserService;
 import org.junit.jupiter.api.BeforeEach;
@@ -57,6 +63,12 @@ class ControllersMockMvcTest {
     private AddressService addressService;
 
     @Mock
+    private ProductService productService;
+
+    @Mock
+    private CategoryService categoryService;
+
+    @Mock
     private UserProductsService userProductsService;
 
     private MockMvc mockMvc;
@@ -70,6 +82,8 @@ class ControllersMockMvcTest {
                         new AuthController(authService, jwtService),
                         new UserController(userService),
                         new AddressController(addressService),
+                        new ProductController(productService),
+                        new CategoryController(categoryService),
                         new UserProductsController(userProductsService)
                 )
                 .setControllerAdvice(new GlobalExceptionHandler())
@@ -212,6 +226,91 @@ class ControllersMockMvcTest {
     }
 
     @Test
+    void productEndpointsDelegateToService() throws Exception {
+        ProductResponse product = productResponse();
+        when(productService.getAllProducts()).thenReturn(List.of(product));
+        when(productService.getProductById(10L)).thenReturn(product);
+        when(productService.getProductsByCategoryId(2L)).thenReturn(List.of(product));
+        when(productService.createProduct(any())).thenReturn(product);
+        when(productService.updateProduct(eq(10L), any())).thenReturn(product);
+
+        String body = """
+                {
+                  "name": "Apple",
+                  "price": 12.5,
+                  "categoryId": 2
+                }
+                """;
+
+        mockMvc.perform(get("/api/products"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$[0].id").value(10));
+
+        mockMvc.perform(get("/api/products/10"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.name").value("Apple"));
+
+        mockMvc.perform(get("/api/products/category/2"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$[0].categoryId").value(2));
+
+        mockMvc.perform(post("/api/products")
+                        .contentType("application/json")
+                        .content(body))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.price").value(12.5));
+
+        mockMvc.perform(put("/api/products/10")
+                        .contentType("application/json")
+                        .content(body))
+                .andExpect(status().isOk());
+
+        mockMvc.perform(delete("/api/products/10"))
+                .andExpect(status().isNoContent());
+
+        verify(productService).deleteProduct(10L);
+    }
+
+    @Test
+    void categoryEndpointsDelegateToService() throws Exception {
+        CategoryResponse category = categoryResponse();
+        when(categoryService.getAllCategories()).thenReturn(List.of(category));
+        when(categoryService.getCategoryById(2L)).thenReturn(category);
+        when(categoryService.createCategory(any())).thenReturn(category);
+        when(categoryService.updateCategory(eq(2L), any())).thenReturn(category);
+
+        String body = """
+                {
+                  "name": "Fruits"
+                }
+                """;
+
+        mockMvc.perform(get("/api/categories"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$[0].id").value(2));
+
+        mockMvc.perform(get("/api/categories/2"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.name").value("Fruits"));
+
+        mockMvc.perform(post("/api/categories")
+                        .contentType("application/json")
+                        .content(body))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id").value(2));
+
+        mockMvc.perform(put("/api/categories/2")
+                        .contentType("application/json")
+                        .content(body))
+                .andExpect(status().isOk());
+
+        mockMvc.perform(delete("/api/categories/2"))
+                .andExpect(status().isNoContent());
+
+        verify(categoryService).deleteCategory(2L);
+    }
+
+    @Test
     void userProductsEndpointsDelegateToService() throws Exception {
         UserProductsResponse item = userProductsResponse(7L, OrderStatus.CART, BigDecimal.valueOf(25));
         UserProductsSummaryResponse summary = summary(item);
@@ -296,6 +395,19 @@ class ControllersMockMvcTest {
     }
 
     @Test
+    void unreadableRequestBodyReturnsBadRequest() throws Exception {
+        mockMvc.perform(patch("/api/user-products/7/status")
+                        .contentType("application/json")
+                        .content("""
+                                {
+                                  "status": "BAD_STATUS"
+                                }
+                                """))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.message").value("Sorğu body-si düzgün deyil"));
+    }
+
+    @Test
     void adminAndCourierEndpointsKeepPreAuthorizeRules() throws Exception {
         assertPreAuthorize(
                 UserController.class.getMethod("getAllUsers"),
@@ -303,6 +415,14 @@ class ControllersMockMvcTest {
         );
         assertPreAuthorize(
                 AddressController.class.getMethod("deleteAddress", Long.class),
+                "hasRole('ADMIN')"
+        );
+        assertPreAuthorize(
+                ProductController.class.getMethod("createProduct", ProductRequest.class),
+                "hasRole('ADMIN')"
+        );
+        assertPreAuthorize(
+                CategoryController.class.getMethod("createCategory", CategoryRequest.class),
                 "hasRole('ADMIN')"
         );
         assertPreAuthorize(
@@ -351,6 +471,24 @@ class ControllersMockMvcTest {
         response.setBuilding("10");
         response.setApartment("5");
         response.setNote("Call before delivery");
+        return response;
+    }
+
+    private ProductResponse productResponse() {
+        ProductResponse response = new ProductResponse();
+        response.setId(10L);
+        response.setName("Apple");
+        response.setPrice(BigDecimal.valueOf(12.5));
+        response.setCategoryId(2L);
+        response.setCategoryName("Fruits");
+        response.setIsActive(true);
+        return response;
+    }
+
+    private CategoryResponse categoryResponse() {
+        CategoryResponse response = new CategoryResponse();
+        response.setId(2L);
+        response.setName("Fruits");
         return response;
     }
 

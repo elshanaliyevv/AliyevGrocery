@@ -8,11 +8,13 @@ import com.example.aliyevgrocery.model.entity.Products;
 import com.example.aliyevgrocery.model.entity.User;
 import com.example.aliyevgrocery.model.entity.UserProducts;
 import com.example.aliyevgrocery.model.request.AddressRequest;
+import com.example.aliyevgrocery.model.request.CategoryRequest;
 import com.example.aliyevgrocery.model.request.ProductRequest;
 import com.example.aliyevgrocery.model.request.UserProductsRequest;
 import com.example.aliyevgrocery.model.request.UserRegister;
 import com.example.aliyevgrocery.model.response.AddressResponse;
 import com.example.aliyevgrocery.model.response.AuthResponse;
+import com.example.aliyevgrocery.model.response.CategoryResponse;
 import com.example.aliyevgrocery.model.response.ProductResponse;
 import com.example.aliyevgrocery.model.response.TokensResponse;
 import com.example.aliyevgrocery.model.response.UserProductsResponse;
@@ -71,6 +73,19 @@ public class Mapper {
         response.setBuilding(address.getBuilding());
         response.setApartment(address.getApartment());
         response.setNote(address.getNote());
+        return response;
+    }
+
+    public Categories toCategory(CategoryRequest request) {
+        Categories category = new Categories();
+        category.setName(request.getName());
+        return category;
+    }
+
+    public CategoryResponse toCategoryResponse(Categories category) {
+        CategoryResponse response = new CategoryResponse();
+        response.setId(category.getId());
+        response.setName(category.getName());
         return response;
     }
 
