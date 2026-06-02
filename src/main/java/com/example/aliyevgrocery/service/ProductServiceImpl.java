@@ -75,6 +75,7 @@ public class ProductServiceImpl implements ProductService {
         Categories category = findCategoryById(request.getCategoryId());
         product.setName(request.getName());
         product.setPrice(request.getPrice());
+        product.setImageUrl(request.getImageUrl());
         product.setCategories(category);
 
         return mapper.toProductResponse(productsRepo.save(product));

@@ -43,6 +43,7 @@ public class Mapper {
         response.setUsername(user.getUsername());
         response.setEmail(user.getEmail());
         response.setNumber(user.getNumber());
+        response.setRole(user.getRole());
         return response;
     }
 
@@ -93,6 +94,7 @@ public class Mapper {
         Products product = new Products();
         product.setName(request.getName());
         product.setPrice(request.getPrice());
+        product.setImageUrl(request.getImageUrl());
         product.setCategories(category);
         product.setIsActive(true);
         return product;
@@ -103,6 +105,7 @@ public class Mapper {
         response.setId(product.getId());
         response.setName(product.getName());
         response.setPrice(product.getPrice());
+        response.setImageUrl(product.getImageUrl());
         response.setCategoryId(product.getCategories() != null ? product.getCategories().getId() : null);
         response.setCategoryName(product.getCategories() != null ? product.getCategories().getName() : null);
         response.setIsActive(product.getIsActive());
