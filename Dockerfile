@@ -1,5 +1,5 @@
 # Build stage
-FROM openjdk:21-jdk-slim as builder
+FROM eclipse-temurin:21-jdk-jammy as builder
 WORKDIR /app
 COPY gradle/ gradle/
 COPY gradlew .
@@ -11,7 +11,7 @@ COPY src/ src/
 RUN chmod +x gradlew && ./gradlew clean build -x test
 
 # Runtime stage
-FROM openjdk:21-jdk-slim
+FROM eclipse-temurin:21-jdk-jammy
 WORKDIR /app
 COPY --from=builder /app/build/libs/*.jar app.jar
 
