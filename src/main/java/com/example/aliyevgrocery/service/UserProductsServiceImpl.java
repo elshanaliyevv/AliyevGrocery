@@ -86,6 +86,11 @@ public class UserProductsServiceImpl implements UserProductsService {
         assertOwner(userProducts, user);
         assertStatus(userProducts, OrderStatus.CART, "Yalnız səbətdə olan məhsulun sayını dəyişə bilərsiniz");
 
+        if (request.getQuantity() == 0) {
+            userProductsRepo.delete(userProducts);
+            return mapper.toUserProductsResponse(userProducts);
+        }
+
         Products product = findActiveProductById(userProducts.getProduct().getId());
         userProducts.setQuantity(request.getQuantity());
         refreshPrice(userProducts, product);
